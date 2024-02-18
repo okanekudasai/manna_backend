@@ -19,11 +19,12 @@ public class TestController {
     @GetMapping("/hello")
     String test() {
         System.out.println("hello world");
-        return "hello world!";
+        return "hello world!!!";
     }
 
     @GetMapping("/getAllTest")
     public List<Test> getAllTest() {
+        System.out.println("옴");
         return testRepository.findAll();
     }
 }
