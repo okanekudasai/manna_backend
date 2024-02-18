@@ -1,9 +1,9 @@
 #!/bin/bash
  echo "> 앱이 실행중인 프로세스를 찾아요!"
- CURRENT_PID=$(pgrep -f demo) #실행중인 파일명으로
+ CURRENT_PID=$(pgrep -f manna) #실행중인 파일명으로
  echo "$CURRENT_PID"
  if [ -z $CURRENT_PID ]; then
-         echo "> no ing app."
+         echo "> 실행중인 프로세스가 없어요."
  else
          echo "> kill -9 $CURRENT_PID"
          kill -9 $CURRENT_PID
