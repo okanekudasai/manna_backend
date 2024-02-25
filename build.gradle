@@ -38,6 +38,11 @@ dependencies {
 
     // json 파싱을 위한 의존성 추가
     implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.9'
+
+    // jwt 토큰을 사용하기 위한 의존성 추가
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 }
 
 tasks.named('test') {
