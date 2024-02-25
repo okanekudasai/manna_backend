@@ -19,8 +19,6 @@ public class LoginController {
 
     @PostMapping("/takeCodeFromClient")
     HashMap<String, String> takeCodeFromClient(@RequestParam String code, @RequestParam String redirect_url) {
-        System.out.println("code: " + code);
-        System.out.println("redirect: " + redirect_url);
         return loginService.getTokenFromGoogle(code, redirect_url);
     }
     @PostMapping("/getUserInfoFromToken")
