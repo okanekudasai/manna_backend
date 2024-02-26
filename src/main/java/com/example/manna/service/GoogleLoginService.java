@@ -1,27 +1,27 @@
 package com.example.manna.service;
 
-import com.example.manna.util.Common;
+import com.example.manna.util.CommonUtil;
+import com.example.manna.util.JwtUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import io.jsonwebtoken.Claims;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 
 @Service
+@RequiredArgsConstructor
 public class GoogleLoginService {
-    @Value("${secret.google.auth.client_id}")
+    @Value("${secret.auth.google.client_id}")
     private String client_id;
 
-    @Value("${secret.google.auth.client_secret}")
+    @Value("${secret.auth.google.client_secret}")
     private String client_secret;
 
-    final
-    Common common;
-
-    public GoogleLoginService(Common common) {
-        this.common = common;
-    }
+    private final CommonUtil commonUtil;
+    private final JwtUtil jwtUtil;
 
     public String getIdTokenFromGoogle(String code, String redirect_url) {
         String reqURL = "https://oauth2.googleapis.com/token";
@@ -31,7 +31,7 @@ public class GoogleLoginService {
         request_body.put("redirect_uri", redirect_url);
         request_body.put("client_secret", client_secret);
         request_body.put("code", code);
-        String res = common.webClient.post()
+        String res = commonUtil.webClient.post()
                 .uri(reqURL)
                 .bodyValue(request_body)
                 .retrieve()
@@ -41,13 +41,11 @@ public class GoogleLoginService {
         assert res != null;
         JsonElement element = JsonParser.parseString(res);
         String id_token = element.getAsJsonObject().get("id_token").getAsString();
-
-        System.out.println("id_token: " + id_token);
-
         return id_token;
     }
 
-    public HashMap<String, String> getUserInfoFromIdToken(String idToken) {
-        return null;
+    public HashMap<String, String> getUserInfoFromIdToken(String id_token) {
+        HashMap<String, String> claim = jwtUtil.parseIdToken(id_token);
+        return claim;
     }
 }
