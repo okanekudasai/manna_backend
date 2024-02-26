@@ -20,7 +20,7 @@ public class TestController {
     @GetMapping("/hello")
     String test() {
         System.out.println("hello world");
-        return "hello world!!";
+        return "hello world!!!";
     }
 
     @GetMapping("/getAllTest")
