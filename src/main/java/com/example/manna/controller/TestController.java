@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/test")
-@CrossOrigin(origins = {"http://localhost:5173", "https://mannayo.duckdns.org"})
 public class TestController {
 
     @Autowired
