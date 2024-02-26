@@ -1,7 +1,7 @@
 package com.example.manna.service;
 
 import com.example.manna.entity.UserDto;
-import com.example.manna.repository.GoogleAuthRepository;
+import com.example.manna.repository.UserRepository;
 import com.example.manna.util.CommonUtil;
 import com.example.manna.util.JwtUtil;
 import com.example.manna.util.TokenDto;
@@ -25,7 +25,7 @@ public class GoogleAuthService {
 
     private final CommonUtil commonUtil;
     private final JwtUtil jwtUtil;
-    private final GoogleAuthRepository googleAuthRepository;
+    private final UserRepository userRepository;
 
     public TokenDto generateToken(String serial_number) {
         return jwtUtil.generateTokenDto(serial_number);
@@ -63,13 +63,13 @@ public class GoogleAuthService {
      * @param id_token
      * @return
      */
-    public HashMap<String, String> getUserInfoFromIdToken(String id_token) {
-        HashMap<String, String> claim = jwtUtil.parseIdToken(id_token);
+    public HashMap<String, String> getUserInfoFromIdToken(String id_token, String host) {
+        HashMap<String, String> claim = jwtUtil.parseIdToken(id_token, host);
         return claim;
     }
 
     public void checkUserExist(HashMap<String, String> user_info) {
-        if (!googleAuthRepository.existsBySerialNumber(user_info.get("serial_number"))) {
+        if (!userRepository.existsBySerialNumber(user_info.get("serial_number"))) {
             System.out.println(user_info.get("email") + " 해당 유저는 없어요!");
             UserDto dto = UserDto.builder()
                     .serialNumber(user_info.get("serial_number"))
@@ -80,7 +80,7 @@ public class GoogleAuthService {
                     .deleted(false)
                     .createdDate(LocalDateTime.now())
                     .build();
-            googleAuthRepository.save(dto);
+            userRepository.save(dto);
         } else {
             System.out.println(user_info.get("email") + " 해당 유저는 있어요!");
         }

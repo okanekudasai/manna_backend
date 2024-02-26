@@ -1,10 +1,9 @@
 package com.example.manna.controller;
 
 
-import com.example.manna.repository.GoogleAuthRepository;
 import com.example.manna.service.GoogleAuthService;
+import com.example.manna.util.JwtUtil;
 import com.example.manna.util.TokenDto;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +15,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class GoogleAuthController {
     final GoogleAuthService googleAuthService;
+    final JwtUtil jwtUtil;
 
     @PostMapping("/takeUserInfoWithCode")
     String takeUserInfoWithCode(@RequestParam String code, @RequestParam String redirect_url, HttpServletResponse response) {
@@ -27,7 +27,7 @@ public class GoogleAuthController {
         }
 
         // id_token을 사용해서 유저 정보를 가져와요
-        HashMap<String, String> user_info = googleAuthService.getUserInfoFromIdToken(id_token);
+        HashMap<String, String> user_info = googleAuthService.getUserInfoFromIdToken(id_token, "google");
 
         // 유저정보가 이미 등록되있는지 여부를 살펴봐요. 등록되있지 않다면 등록해요
         googleAuthService.checkUserExist(user_info);
@@ -36,10 +36,8 @@ public class GoogleAuthController {
         TokenDto token = googleAuthService.generateToken(user_info.get("serial_number"));
 
         // 만든 토큰을 쿠키에 저장해요
-        addCookie("access_token", token.getAccessToken(), response);
-        addCookie("refresh_token", token.getRefreshToken(), response);
-        addCookie("grant_type", token.getGrantType(), response);
-        addCookie("authorization_type", token.getAuthorizationType(), response);
+        jwtUtil.addCookieList(token, response);
+
 
         // 토큰을 반환해줘요
         return "Ok";
@@ -53,12 +51,5 @@ public class GoogleAuthController {
 //        return loginService.getUserInfoFromToken(access_token, refresh_token);
 //    }
 
-    void addCookie(String name, String value, HttpServletResponse response) {
-        System.out.println(response);
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
-    }
+
 }

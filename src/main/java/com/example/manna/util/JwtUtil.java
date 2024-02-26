@@ -12,6 +12,8 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -86,12 +88,12 @@ public class JwtUtil {
         }
     }
 
-    public HashMap<String, String> parseIdToken(String token) {
+    public HashMap<String, String> parseIdToken(String token, String host) {
         try {
             byte[] decode = Base64.getUrlDecoder().decode(token.split("\\.")[1]);
             String info = new String(decode, StandardCharsets.UTF_8);
             JsonElement element = JsonParser.parseString(info);
-            String serial_number = "google_" + element.getAsJsonObject().get("sub").getAsString();
+            String serial_number = host + "_" + element.getAsJsonObject().get("sub").getAsString();
             String email = element.getAsJsonObject().get("email").getAsString();
             String name = element.getAsJsonObject().get("name").getAsString();
             String profile_url = element.getAsJsonObject().get("picture").getAsString();
@@ -107,5 +109,20 @@ public class JwtUtil {
         } catch(ExpiredJwtException e) {
             return null;
         }
+    }
+
+    public void addCookie(String name, String value, HttpServletResponse response) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
+    }
+
+    public void addCookieList(TokenDto token, HttpServletResponse response) {
+        addCookie("access_token", token.getAccessToken(), response);
+        addCookie("refresh_token", token.getRefreshToken(), response);
+        addCookie("grant_type", token.getGrantType(), response);
+        addCookie("authorization_type", token.getAuthorizationType(), response);
     }
 }
