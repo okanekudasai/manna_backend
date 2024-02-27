@@ -42,7 +42,7 @@ public class TokenInterceptor implements HandlerInterceptor {
                 } else {
                     String serial_number = refresh_claims.getSubject();
                     TokenDto token = jwtUtil.generateTokenDto(serial_number);
-                    jwtUtil.addCookieList(token, response);
+                    jwtUtil.addCookieList(token, response, true);
                     request.setAttribute("serial_number", serial_number);
                     return true;
                 }

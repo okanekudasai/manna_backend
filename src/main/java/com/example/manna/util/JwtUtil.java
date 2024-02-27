@@ -13,6 +13,7 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -73,8 +74,8 @@ public class JwtUtil {
                 .compact();
 
         return TokenDto.builder()
-                .grantType(BEARER_TYPE)
-                .authorizationType(AUTHORIZATION_HEADER)
+//                .grantType(BEARER_TYPE)
+//                .authorizationType(AUTHORIZATION_HEADER)
                 .accessToken(access_token)
                 .refreshToken(refresh_token)
                 .build();
@@ -111,18 +112,35 @@ public class JwtUtil {
         }
     }
 
-    public void addCookie(String name, String value, HttpServletResponse response) {
+    public void addCookie(String name, String value, HttpServletResponse response, boolean keep) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
+        if (keep) {
+            cookie.setMaxAge(Integer.MAX_VALUE);
+        }
         response.addCookie(cookie);
     }
 
-    public void addCookieList(TokenDto token, HttpServletResponse response) {
-        addCookie("access_token", token.getAccessToken(), response);
-        addCookie("refresh_token", token.getRefreshToken(), response);
-        addCookie("grant_type", token.getGrantType(), response);
-        addCookie("authorization_type", token.getAuthorizationType(), response);
+    public void addCookieList(TokenDto token, HttpServletResponse response, boolean keep) {
+        addCookie("access_token", token.getAccessToken(), response, keep);
+        addCookie("refresh_token", token.getRefreshToken(), response, keep);
+        addCookie("grant_type", token.getGrantType(), response, keep);
+        addCookie("authorization_type", token.getAuthorizationType(), response, keep);
+    }
+
+    public void deleteCookie(String name, HttpServletResponse response) {
+        System.out.println(name);
+        Cookie cookie = new Cookie(name, "");
+        cookie.setPath("/");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+    }
+    public void deleteCookieList(HttpServletResponse response) {
+        deleteCookie("access_token", response);
+        deleteCookie("refresh_token", response);
+        deleteCookie("grant_type", response);
+        deleteCookie("authorization_type",  response);
     }
 }

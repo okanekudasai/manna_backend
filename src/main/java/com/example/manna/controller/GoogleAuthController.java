@@ -1,6 +1,7 @@
 package com.example.manna.controller;
 
 
+import com.example.manna.service.AuthService;
 import com.example.manna.service.GoogleAuthService;
 import com.example.manna.util.JwtUtil;
 import com.example.manna.util.TokenDto;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 @RequestMapping("/auth/google")
 @RequiredArgsConstructor
 public class GoogleAuthController {
+    final AuthService authService;
     final GoogleAuthService googleAuthService;
     final JwtUtil jwtUtil;
 
@@ -27,20 +29,19 @@ public class GoogleAuthController {
         }
 
         // id_token을 사용해서 유저 정보를 가져와요
-        HashMap<String, String> user_info = googleAuthService.getUserInfoFromIdToken(id_token, "google");
+        HashMap<String, String> user_info = authService.getUserInfoFromIdToken(id_token, "google");
 
         // 유저정보가 이미 등록되있는지 여부를 살펴봐요. 등록되있지 않다면 등록해요
-        googleAuthService.checkUserExist(user_info);
+        String res = authService.checkUserExist(user_info, response);
 
         // 토큰을 만들어요
-        TokenDto token = googleAuthService.generateToken(user_info.get("serial_number"));
+        TokenDto token = authService.generateToken(user_info.get("serial_number"));
 
         // 만든 토큰을 쿠키에 저장해요
-        jwtUtil.addCookieList(token, response);
-
+        jwtUtil.addCookieList(token, response, true);
 
         // 토큰을 반환해줘요
-        return "Ok";
+        return res;
     }
     @PostMapping("/enrollNewUserWithUserInfo")
     boolean enrollNewUser() {
@@ -50,6 +51,4 @@ public class GoogleAuthController {
 //    String getUserInfoFromToken(@RequestParam String access_token, @RequestParam String refresh_token) {
 //        return loginService.getUserInfoFromToken(access_token, refresh_token);
 //    }
-
-
 }
