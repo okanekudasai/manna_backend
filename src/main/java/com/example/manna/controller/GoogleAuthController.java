@@ -38,7 +38,7 @@ public class GoogleAuthController {
         TokenDto token = authService.generateToken(user_info.get("serial_number"));
 
         // 만든 토큰을 쿠키에 저장해요
-        jwtUtil.addCookieList(token, response, true);
+        jwtUtil.addCookieList(token, response, false);
 
         // 토큰을 반환해줘요
         return res;

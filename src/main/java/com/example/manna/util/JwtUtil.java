@@ -84,7 +84,7 @@ public class JwtUtil {
     public Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        } catch(ExpiredJwtException e) {
+        } catch(Exception e) {
             return null;
         }
     }
@@ -126,8 +126,8 @@ public class JwtUtil {
     public void addCookieList(TokenDto token, HttpServletResponse response, boolean keep) {
         addCookie("access_token", token.getAccessToken(), response, keep);
         addCookie("refresh_token", token.getRefreshToken(), response, keep);
-        addCookie("grant_type", token.getGrantType(), response, keep);
-        addCookie("authorization_type", token.getAuthorizationType(), response, keep);
+//        addCookie("grant_type", token.getGrantType(), response, keep);
+//        addCookie("authorization_type", token.getAuthorizationType(), response, keep);
     }
 
     public void deleteCookie(String name, HttpServletResponse response) {
@@ -140,7 +140,7 @@ public class JwtUtil {
     public void deleteCookieList(HttpServletResponse response) {
         deleteCookie("access_token", response);
         deleteCookie("refresh_token", response);
-        deleteCookie("grant_type", response);
-        deleteCookie("authorization_type",  response);
+//        deleteCookie("grant_type", response);
+//        deleteCookie("authorization_type",  response);
     }
 }
