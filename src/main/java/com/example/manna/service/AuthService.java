@@ -51,7 +51,7 @@ public class AuthService {
                     .createdDate(LocalDateTime.now())
                     .build();
             userRepository.save(dto);
-            Cookie cookie = new Cookie("keep_login", "false");
+            Cookie cookie = new Cookie("keep_login", "true");
             cookie.setPath("/");
             cookie.setMaxAge(Integer.MAX_VALUE);
             response.addCookie(cookie);
