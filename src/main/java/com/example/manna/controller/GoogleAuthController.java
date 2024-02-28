@@ -43,12 +43,5 @@ public class GoogleAuthController {
         // 토큰을 반환해줘요
         return res;
     }
-    @PostMapping("/enrollNewUserWithUserInfo")
-    boolean enrollNewUser() {
-        return false;
-    }
-//    @PostMapping("/getUserInfoFromToken")
-//    String getUserInfoFromToken(@RequestParam String access_token, @RequestParam String refresh_token) {
-//        return loginService.getUserInfoFromToken(access_token, refresh_token);
-//    }
+
 }

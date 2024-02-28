@@ -131,7 +131,7 @@ public class JwtUtil {
     }
 
     public void deleteCookie(String name, HttpServletResponse response) {
-        System.out.println(name);
+//        System.out.println(name);
         Cookie cookie = new Cookie(name, "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
