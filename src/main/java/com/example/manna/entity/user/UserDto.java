@@ -1,13 +1,16 @@
-package com.example.manna.entity;
+package com.example.manna.entity.user;
 
+import com.example.manna.entity.feed.FeedDto;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -48,4 +51,9 @@ public class UserDto {
 
     @Column(name = "deleted")
     private Boolean deleted;
+
+    @JsonIgnore
+    @ToString.Exclude
+    @OneToMany(mappedBy="writer")
+    private List<FeedDto> feed_list = new ArrayList<>();
 }

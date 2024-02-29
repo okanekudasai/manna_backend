@@ -1,7 +1,7 @@
 package com.example.manna.controller;
 
 
-import com.example.manna.entity.UserDto;
+import com.example.manna.entity.user.UserDto;
 import com.example.manna.service.AuthService;
 import com.example.manna.service.GoogleAuthService;
 import com.example.manna.util.JwtUtil;

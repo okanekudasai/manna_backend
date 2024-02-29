@@ -1,6 +1,6 @@
 package com.example.manna.repository;
 
-import com.example.manna.entity.UserDto;
+import com.example.manna.entity.user.UserDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<UserDto, Long> {
