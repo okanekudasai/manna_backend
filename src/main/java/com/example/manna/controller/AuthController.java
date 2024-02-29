@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -18,9 +20,10 @@ public class AuthController {
     static long anonymous_number = 1000;
     @GetMapping("/token/getUserInfo")
     public UserDto UserInfo(HttpServletRequest request) {
-        String serial_number = request.getAttribute("serial_number").toString();
-        UserDto user = userRepository.findBySerialNumber(serial_number);
-        return user;
+        String idx = request.getAttribute("idx").toString();
+        Optional<UserDto> user = userRepository.findById(Long.parseLong(idx));
+        UserDto user_entity = user.orElse(null);
+        return user_entity;
     }
 
     @PostMapping("/token/changeTokenAge")

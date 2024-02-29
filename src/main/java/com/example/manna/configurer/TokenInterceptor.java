@@ -40,14 +40,14 @@ public class TokenInterceptor implements HandlerInterceptor {
                 if (refresh_claims == null) {
                     return false;
                 } else {
-                    String serial_number = refresh_claims.getSubject();
-                    TokenDto token = jwtUtil.generateTokenDto(serial_number);
+                    String idx = refresh_claims.getSubject();
+                    TokenDto token = jwtUtil.generateTokenDto(idx);
                     jwtUtil.addCookieList(token, response, true);
-                    request.setAttribute("serial_number", serial_number);
+                    request.setAttribute("idx", idx);
                     return true;
                 }
             } else {
-                request.setAttribute("serial_number", access_claims.getSubject());
+                request.setAttribute("idx", access_claims.getSubject());
                 return true;
             }
         }

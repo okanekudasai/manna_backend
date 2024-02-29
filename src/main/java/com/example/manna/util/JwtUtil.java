@@ -27,10 +27,6 @@ import java.util.*;
 
 @Component
 public class JwtUtil {
-    public static final String BEARER_TYPE = "Bearer";
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String REFRESH_HEADER = "Refresh";
-    public static final String BEARER_PREFIX = "Bearer ";
 
     @Value("${jwt.key}")
     private String secret_key;
@@ -58,17 +54,17 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public TokenDto generateTokenDto(String serial_number) {
+    public TokenDto generateTokenDto(String idx) {
         long now = (new Date()).getTime();
 
         String access_token = Jwts.builder()
-                .setSubject(serial_number)
+                .setSubject(idx)
                 .setExpiration(new Date(now + access_token_expiration * 1000))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refresh_token = Jwts.builder()
-                .setSubject(serial_number)
+                .setSubject(idx)
                 .setExpiration(new Date(now + refresh_token_expiration * 1000))
                 .signWith(key)
                 .compact();

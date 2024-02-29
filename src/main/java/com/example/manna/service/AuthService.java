@@ -22,8 +22,8 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
 
-    public TokenDto generateToken(String serial_number) {
-        return jwtUtil.generateTokenDto(serial_number);
+    public TokenDto generateToken(String idx) {
+        return jwtUtil.generateTokenDto(idx);
     }
 
 
@@ -38,8 +38,10 @@ public class AuthService {
     }
 
 
-    public String checkUserExist(HashMap<String, String> user_info) {
-        if (!userRepository.existsBySerialNumber(user_info.get("serial_number"))) {
+    public UserDto checkUserExist(HashMap<String, String> user_info) {
+        UserDto user = userRepository.findBySerialNumberAndDeleted(user_info.get("serial_number"), Boolean.parseBoolean(user_info.get("deleted")));
+//        if (!userRepository.existsBySerialNumberAndDeleted(user_info.get("serial_number"), Boolean.parseBoolean(user_info.get("deleted")))) {
+        if (user == null) {
             System.out.println(user_info.get("email") + " 해당 유저는 없어요!");
             UserDto dto = UserDto.builder()
                     .serialNumber(user_info.get("serial_number"))
@@ -50,11 +52,11 @@ public class AuthService {
                     .deleted(false)
                     .createdDate(LocalDateTime.now())
                     .build();
-            userRepository.save(dto);
-            return "noobie";
+
+            return userRepository.save(dto);
         } else {
             System.out.println(user_info.get("email") + " 해당 유저는 있어요!");
-            return "exist";
+            return user;
         }
     }
 
