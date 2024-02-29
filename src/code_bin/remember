@@ -1,0 +1,6 @@
+@Slf4j  //이거사용하면 로그를 쉽게 나타낼 수 있음
+
+
+    private LocalDateTime getTokenExpiration(long expirationSecond) {
+        return LocalDateTime.now().plus(expirationSecond, ChronoUnit.SECONDS);
+    }
