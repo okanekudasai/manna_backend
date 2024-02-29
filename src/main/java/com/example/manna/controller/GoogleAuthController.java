@@ -32,10 +32,13 @@ public class GoogleAuthController {
         HashMap<String, String> user_info = authService.getUserInfoFromIdToken(id_token, "google");
 
         // 유저정보가 이미 등록되있는지 여부를 살펴봐요. 등록되있지 않다면 등록해요
-        String res = authService.checkUserExist(user_info, response);
+        String res = authService.checkUserExist(user_info);
 
         // 토큰을 만들어요
         TokenDto token = authService.generateToken(user_info.get("serial_number"));
+
+        // 코드로 로그인 하면 꼭 keeplogin을 true로 해줄게요
+        jwtUtil.keep_login_true(response);
 
         // 만든 토큰을 쿠키에 저장해요
         jwtUtil.addCookieList(token, response, false);

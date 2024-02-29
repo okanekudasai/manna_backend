@@ -38,7 +38,7 @@ public class AuthService {
     }
 
 
-    public String checkUserExist(HashMap<String, String> user_info, HttpServletResponse response) {
+    public String checkUserExist(HashMap<String, String> user_info) {
         if (!userRepository.existsBySerialNumber(user_info.get("serial_number"))) {
             System.out.println(user_info.get("email") + " 해당 유저는 없어요!");
             UserDto dto = UserDto.builder()
@@ -51,10 +51,6 @@ public class AuthService {
                     .createdDate(LocalDateTime.now())
                     .build();
             userRepository.save(dto);
-            Cookie cookie = new Cookie("keep_login", "true");
-            cookie.setPath("/");
-            cookie.setMaxAge(Integer.MAX_VALUE);
-            response.addCookie(cookie);
             return "noobie";
         } else {
             System.out.println(user_info.get("email") + " 해당 유저는 있어요!");

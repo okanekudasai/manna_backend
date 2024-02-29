@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     final UserRepository userRepository;
     final AuthService authService;
+
+    static long anonymous_number = 1000;
     @GetMapping("/token/getUserInfo")
     public UserDto UserInfo(HttpServletRequest request) {
         String serial_number = request.getAttribute("serial_number").toString();
@@ -39,5 +41,11 @@ public class AuthController {
         } catch(Exception e) {
             return "FAIL";
         }
+    }
+
+    @GetMapping("/getAnonymousNumber")
+    public long getAnonymousNumber() {
+        anonymous_number++;
+        return anonymous_number;
     }
 }

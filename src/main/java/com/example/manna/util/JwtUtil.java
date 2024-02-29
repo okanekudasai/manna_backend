@@ -143,4 +143,11 @@ public class JwtUtil {
 //        deleteCookie("grant_type", response);
 //        deleteCookie("authorization_type",  response);
     }
+
+    public void keep_login_true(HttpServletResponse response) {
+        Cookie cookie = new Cookie("keep_login", "true");
+        cookie.setPath("/");
+        cookie.setMaxAge(Integer.MAX_VALUE);
+        response.addCookie(cookie);
+    }
 }
