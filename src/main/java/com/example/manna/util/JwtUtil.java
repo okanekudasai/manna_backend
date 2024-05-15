@@ -83,19 +83,20 @@ public class JwtUtil {
         try {
             byte[] decode = Base64.getUrlDecoder().decode(token.split("\\.")[1]);
             String info = new String(decode, StandardCharsets.UTF_8);
+            System.out.println("*******     " + info);
             JsonElement element = JsonParser.parseString(info);
             String serial_number = host + "_" + element.getAsJsonObject().get("sub").getAsString();
             String email = element.getAsJsonObject().get("email").getAsString();
             String name = element.getAsJsonObject().get("name").getAsString();
             String profile_url = element.getAsJsonObject().get("picture").getAsString();
-            String locale = element.getAsJsonObject().get("locale").getAsString();
+//            String locale = element.getAsJsonObject().get("locale").getAsString();
 
             HashMap<String, String> res = new HashMap<>();
             res.put("serial_number", serial_number);
             res.put("email", email);
             res.put("name", name);
             res.put("profile_url", profile_url);
-            res.put("locale", locale);
+//            res.put("locale", locale);
             return res;
         } catch(ExpiredJwtException e) {
             return null;
