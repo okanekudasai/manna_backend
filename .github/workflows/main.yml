@@ -19,6 +19,12 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
 
+      - name: Set FIREBASE
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.SECRET_FIREBASE }}" | base64 --decode > src/main/resources/mannayo-6dcdb-firebase-adminsdk-3pf5g-6230376f83.json
+          find src
+
       - name: Set YML
         run: |
           mkdir -p src/main/resources
