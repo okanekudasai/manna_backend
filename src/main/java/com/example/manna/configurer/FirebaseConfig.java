@@ -22,7 +22,9 @@ public class FirebaseConfig {
         @PostConstruct
         public void initializeFCM() throws IOException {
             try {
+                System.out.println("시작합니다 " + firebaseSdkPath);
                 FileInputStream serviceAccount = new FileInputStream(firebaseSdkPath);
+                System.out.println("파일 : " + serviceAccount);
                 FirebaseOptions options = FirebaseOptions.builder().setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
                 FirebaseApp.initializeApp(options);
             } catch (FileNotFoundException e) {
