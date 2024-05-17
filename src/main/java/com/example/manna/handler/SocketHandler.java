@@ -41,8 +41,8 @@ public class SocketHandler extends TextWebSocketHandler {
         dto.put("value", value);
 
         // 룸 초기화 작업
-        chatRoomSet = new HashSet<ChatRoom>();
-        chatRoomSet.add(ChatRoom.builder().idx(room_number++).title("dummy").people_set(new HashSet<>()).host(null).build());
+        chatRoomSet = new HashSet<>();
+//        chatRoomSet.add(ChatRoom.builder().idx(room_number++).title("dummy").people_set(new HashSet<>()).host(null).build());
     }
 
     @Override
@@ -101,29 +101,56 @@ public class SocketHandler extends TextWebSocketHandler {
             System.out.println(data);
             String title = data.getAsJsonObject().get("title").getAsString();
             HashSet<SessionInfo> people_set = new HashSet<>();
-            people_set.add(host);
-            ChatRoom new_room = ChatRoom.builder().idx(room_number++).people_set(people_set).host(host).title(title).build();
+            ChatRoom new_room = ChatRoom.builder().idx(room_number).people_set(people_set).host(host).title(title).build();
             chatRoomSet.add(new_room);
-            dto.put("code", "get_room_list");
-            dto.put("value", chatRoomSet);
 
-            for (WebSocketSession ws : session_set) {
-                ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
-            }
+
+            dto.put("code", "get_my_room_number");
+            dto.put("value", String.valueOf(room_number++));
+            session.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
         } else if (event.equals("enter_lobby")) {
             SessionInfo s = session_info.get(session);
             if (s == null) {
                 log.info("등록되지 않은 세션");
                 return;
             }
+            int idx = data.getAsJsonObject().get("idx").getAsInt();
+            for (ChatRoom room : chatRoomSet) {
+                if (room.getIdx() != idx) continue;
+                room.getPeople_set().remove(s);
+                if (room.getPeople_set().isEmpty()) {
+                    chatRoomSet.remove(room);
+                }
+                break;
+            }
             s.in_lobby = true;
+            dto.put("code", "get_room_list");
+            dto.put("value", chatRoomSet);
+
+            for (WebSocketSession ws : session_set) {
+                if (ws == session) continue;
+                ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
+            }
         } else if (event.equals("enter_room")) {
             SessionInfo s = session_info.get(session);
             if (s == null) {
                 log.info("등록되지 않은 세션");
                 return;
             }
+            int idx = data.getAsJsonObject().get("idx").getAsInt();
+            for (ChatRoom room : chatRoomSet) {
+                if (room.getIdx() != idx) continue;
+                room.getPeople_set().add(s);
+                break;
+            }
             s.in_lobby = false;
+            dto.put("code", "get_room_list");
+            dto.put("value", chatRoomSet);
+
+            for (WebSocketSession ws : session_set) {
+                if (ws == session) continue;
+                ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
+            }
         } else if (event.equals("lobby_chat")) {
             String sender = data.getAsJsonObject().get("sender").getAsString();
             String text = data.getAsJsonObject().get("text").getAsString();
@@ -134,7 +161,7 @@ public class SocketHandler extends TextWebSocketHandler {
             content.put("sender", sender);
             content.put("text", text);
             for (WebSocketSession ws : session_set) {
-                if (!session_info.get(session).in_lobby) {
+                if (!session_info.get(ws).in_lobby) {
                     System.out.println("로비에없음");
                     continue;
                 }
