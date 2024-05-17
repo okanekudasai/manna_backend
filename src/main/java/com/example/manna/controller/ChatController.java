@@ -8,10 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 
@@ -56,4 +53,10 @@ public class ChatController {
         }
         return String.valueOf(flag);
     }
+    @DeleteMapping("/deleteToken")
+    void deleteToken(HttpServletResponse response) {
+        jwtUtil.deleteCookie("access_token", response);
+    }
+
+
 }

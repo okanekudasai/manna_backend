@@ -14,5 +14,5 @@ public class SessionInfo {
     String nickname;
     int level;
     int exp;
-    boolean is_lobby;
+    boolean in_lobby;
 }

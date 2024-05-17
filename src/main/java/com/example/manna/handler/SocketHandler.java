@@ -69,7 +69,7 @@ public class SocketHandler extends TextWebSocketHandler {
             String nickname = data.getAsJsonObject().get("nickname").getAsString();
             int level = data.getAsJsonObject().get("level").getAsInt();
             int exp = data.getAsJsonObject().get("exp").getAsInt();
-            SessionInfo new_person_info = SessionInfo.builder().session_id(session.getId()).exp(exp).level(level).nickname(nickname).build();
+            SessionInfo new_person_info = SessionInfo.builder().session_id(session.getId()).exp(exp).level(level).nickname(nickname).in_lobby(true).build();
 
             // 기존에 있던 사람들에게 새로운 사람이 왔다는걸 알려요
             value = new HashMap<>();
@@ -110,6 +110,19 @@ public class SocketHandler extends TextWebSocketHandler {
             for (WebSocketSession ws : session_set) {
                 ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
             }
+        } else if (event.equals("enter_lobby")) {
+            System.out.println("엔터로비");
+            SessionInfo s = session_info.get(session);
+            System.out.println(session_info);
+            if (s == null) return;
+            s.in_lobby = true;
+            System.out.println("로비 들어옴 확인");
+        } else if (event.equals("enter_room")) {
+            System.out.println("엔터룸");
+            SessionInfo s = session_info.get(session);
+            if (s == null) return;
+            s.in_lobby = false;
+            System.out.println("방 들어감 확인");
         }
     }
 
