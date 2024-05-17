@@ -44,11 +44,9 @@ public class ChatController {
         Claims claims = jwtUtil.parseClaims(access_token);
         boolean flag = false;
         if(claims == null) {
-            System.out.println("실패");
             jwtUtil.deleteCookie("access_token", response);
         } else {
             flag = true;
-            System.out.println("성공");
             jwtUtil.deleteCookie("access_token", response);
         }
         return String.valueOf(flag);

@@ -111,18 +111,35 @@ public class SocketHandler extends TextWebSocketHandler {
                 ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
             }
         } else if (event.equals("enter_lobby")) {
-            System.out.println("엔터로비");
             SessionInfo s = session_info.get(session);
-            System.out.println(session_info);
-            if (s == null) return;
+            if (s == null) {
+                log.info("등록되지 않은 세션");
+                return;
+            }
             s.in_lobby = true;
-            System.out.println("로비 들어옴 확인");
         } else if (event.equals("enter_room")) {
-            System.out.println("엔터룸");
             SessionInfo s = session_info.get(session);
-            if (s == null) return;
+            if (s == null) {
+                log.info("등록되지 않은 세션");
+                return;
+            }
             s.in_lobby = false;
-            System.out.println("방 들어감 확인");
+        } else if (event.equals("lobby_chat")) {
+            String sender = data.getAsJsonObject().get("sender").getAsString();
+            String text = data.getAsJsonObject().get("text").getAsString();
+
+            HashMap<String, String> content = new HashMap<>();
+            dto.put("code", "get_lobby_chat");
+            dto.put("value", content);
+            content.put("sender", sender);
+            content.put("text", text);
+            for (WebSocketSession ws : session_set) {
+                if (!session_info.get(session).in_lobby) {
+                    System.out.println("로비에없음");
+                    continue;
+                }
+                ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
+            }
         }
     }
 
