@@ -43,11 +43,8 @@ public class ChatController {
         }
         Claims claims = jwtUtil.parseClaims(access_token);
         boolean flag = false;
-        if(claims == null) {
-            jwtUtil.deleteCookie("access_token", response);
-        } else {
+        if(claims != null) {
             flag = true;
-            jwtUtil.deleteCookie("access_token", response);
         }
         return String.valueOf(flag);
     }

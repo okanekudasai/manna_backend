@@ -69,7 +69,7 @@ public class SocketHandler extends TextWebSocketHandler {
             String nickname = data.getAsJsonObject().get("nickname").getAsString();
             int level = data.getAsJsonObject().get("level").getAsInt();
             int exp = data.getAsJsonObject().get("exp").getAsInt();
-            SessionInfo new_person_info = SessionInfo.builder().session_id(session.getId()).exp(exp).level(level).nickname(nickname).in_lobby(true).build();
+            SessionInfo new_person_info = SessionInfo.builder().session_id(session.getId()).exp(exp).level(level).nickname(nickname).room_number(0).build();
 
             // 기존에 있던 사람들에게 새로운 사람이 왔다는걸 알려요
             value = new HashMap<>();
@@ -98,12 +98,10 @@ public class SocketHandler extends TextWebSocketHandler {
         } else if (event.equals("make_room")) {
 
             SessionInfo host = session_info.get(session);
-            System.out.println(data);
             String title = data.getAsJsonObject().get("title").getAsString();
             HashSet<SessionInfo> people_set = new HashSet<>();
             ChatRoom new_room = ChatRoom.builder().idx(room_number).people_set(people_set).host(host).title(title).build();
             chatRoomSet.add(new_room);
-
 
             dto.put("code", "get_my_room_number");
             dto.put("value", String.valueOf(room_number++));
@@ -123,13 +121,19 @@ public class SocketHandler extends TextWebSocketHandler {
                 }
                 break;
             }
-            s.in_lobby = true;
+            s.room_number = 0;
+            HashMap<String, Object> value = new HashMap<>();
             dto.put("code", "get_room_list");
-            dto.put("value", chatRoomSet);
+            dto.put("value", value);
+
+            value.put("chatroom_set", chatRoomSet);
+            HashSet<SessionInfo> people_set_except_me = new HashSet<>(session_info.values());
+            value.put("people_set", people_set_except_me);
 
             for (WebSocketSession ws : session_set) {
-                if (ws == session) continue;
+                people_set_except_me.remove(session_info.get(ws));
                 ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
+                people_set_except_me.add(session_info.get(ws));
             }
         } else if (event.equals("enter_room")) {
             SessionInfo s = session_info.get(session);
@@ -140,20 +144,29 @@ public class SocketHandler extends TextWebSocketHandler {
             int idx = data.getAsJsonObject().get("idx").getAsInt();
             for (ChatRoom room : chatRoomSet) {
                 if (room.getIdx() != idx) continue;
+                System.out.println("찾음!");
                 room.getPeople_set().add(s);
                 break;
             }
-            s.in_lobby = false;
+            s.room_number = idx;
+            HashMap<String, Object> value = new HashMap<>();
             dto.put("code", "get_room_list");
-            dto.put("value", chatRoomSet);
+            dto.put("value", value);
+
+            value.put("chatroom_set", chatRoomSet);
+            HashSet<SessionInfo> people_set_except_me = new HashSet<>(session_info.values());
+            System.out.println(people_set_except_me);
+            value.put("people_set", people_set_except_me);
 
             for (WebSocketSession ws : session_set) {
-                if (ws == session) continue;
+                people_set_except_me.remove(session_info.get(ws));
                 ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
+                people_set_except_me.add(session_info.get(ws));
             }
-        } else if (event.equals("lobby_chat")) {
+        } else if (event.equals("room_chat")) {
             String sender = data.getAsJsonObject().get("sender").getAsString();
             String text = data.getAsJsonObject().get("text").getAsString();
+            int room_number = data.getAsJsonObject().get("roomNumber").getAsInt();
 
             HashMap<String, String> content = new HashMap<>();
             dto.put("code", "get_lobby_chat");
@@ -161,8 +174,8 @@ public class SocketHandler extends TextWebSocketHandler {
             content.put("sender", sender);
             content.put("text", text);
             for (WebSocketSession ws : session_set) {
-                if (!session_info.get(ws).in_lobby) {
-                    System.out.println("로비에없음");
+                if (session_info.get(ws).room_number != room_number) {
+                    System.out.println("다른곳에 있음");
                     continue;
                 }
                 ws.sendMessage(new TextMessage(mapper.writeValueAsString(dto)));
@@ -183,7 +196,18 @@ public class SocketHandler extends TextWebSocketHandler {
         // dto를 만들게요
         dto.put("code", "person_leaved");
         value = new HashMap<>();
-        value.put("person", session_info.get(session));
+        SessionInfo si = session_info.get(session);
+        value.put("person", si);
+        int room_idx = si.getRoom_number();
+        if (room_idx > 0) {
+            for (ChatRoom room : chatRoomSet) {
+                if (room.getIdx() != room_idx) continue;
+                room.getPeople_set().remove(si);
+                if (room.getPeople_set().isEmpty()) chatRoomSet.remove(room);
+                break;
+            }
+        }
+        value.put("room", chatRoomSet);
         dto.put("value", value);
 
         for (WebSocketSession s : session_set) {
